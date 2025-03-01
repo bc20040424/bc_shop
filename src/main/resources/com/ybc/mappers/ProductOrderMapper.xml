@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ybc.mappers.ProductOrderMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.ybc.entity.po.ProductOrder">
+		<!--订单id-->
+		<result column="oid" property="oid"  />
+		<!--用户id-->
+		<result column="uid" property="uid"  />
+		<!--收货人姓名-->
+		<result column="recv_name" property="recvName"  />
+		<!--收货人电话-->
+		<result column="recv_phone" property="recvPhone"  />
+		<!--收货人所在省-->
+		<result column="recv_province" property="recvProvince"  />
+		<!--收货人所在市-->
+		<result column="recv_city" property="recvCity"  />
+		<!--收货人所在区-->
+		<result column="recv_area" property="recvArea"  />
+		<!--收货详细地址-->
+		<result column="recv_address" property="recvAddress"  />
+		<!--总价-->
+		<result column="total_price" property="totalPrice"  />
+		<!--状态：0-未支付，1-已支付，2-已取消，3-已关闭，4-已完成-->
+		<result column="status" property="status"  />
+		<!--下单时间-->
+		<result column="order_time" property="orderTime"  />
+		<!--支付时间-->
+		<result column="pay_time" property="payTime"  />
+		<!--创建人-->
+		<result column="created_user" property="createdUser"  />
+		<!--创建时间-->
+		<result column="created_time" property="createdTime"  />
+		<!--修改人-->
+		<result column="modified_user" property="modifiedUser"  />
+		<!--修改时间-->
+		<result column="modified_time" property="modifiedTime"  />
+		<!--购买数量-->
+		<result column="num" property="num" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 p.oid,p.uid,p.recv_name,p.recv_phone,p.recv_province,
+		 p.recv_city,p.recv_area,p.recv_address,p.total_price,p.status,
+		 p.order_time,p.pay_time,p.created_user,p.created_time,p.modified_user,
+		 p.modified_time
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.oid != null and query.oid!=''">
+				 and  p.oid = #{query.oid}
+			</if>
+			<if test="query.uid != null and query.uid!=''">
+				 and  p.uid = #{query.uid}
+			</if>
+			<if test="query.recvName != null and query.recvName!=''">
+				 and  p.recv_name = #{query.recvName}
+			</if>
+			<if test="query.recvPhone != null and query.recvPhone!=''">
+				 and  p.recv_phone = #{query.recvPhone}
+			</if>
+			<if test="query.recvProvince != null and query.recvProvince!=''">
+				 and  p.recv_province = #{query.recvProvince}
+			</if>
+			<if test="query.recvCity != null and query.recvCity!=''">
+				 and  p.recv_city = #{query.recvCity}
+			</if>
+			<if test="query.recvArea != null and query.recvArea!=''">
+				 and  p.recv_area = #{query.recvArea}
+			</if>
+			<if test="query.recvAddress != null and query.recvAddress!=''">
+				 and  p.recv_address = #{query.recvAddress}
+			</if>
+			<if test="query.totalPrice != null">
+				 and  p.total_price = #{query.totalPrice}
+			</if>
+			<if test="query.status != null">
+				 and  p.status = #{query.status}
+			</if>
+			<if test="query.orderTime != null and query.orderTime!=''">
+				 <![CDATA[ and  p.order_time=str_to_date(#{query.orderTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.payTime != null and query.payTime!=''">
+				 <![CDATA[ and  p.pay_time=str_to_date(#{query.payTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createdUser != null and query.createdUser!=''">
+				 and  p.created_user = #{query.createdUser}
+			</if>
+			<if test="query.createdTime != null and query.createdTime!=''">
+				 <![CDATA[ and  p.created_time=str_to_date(#{query.createdTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.modifiedUser != null and query.modifiedUser!=''">
+				 and  p.modified_user = #{query.modifiedUser}
+			</if>
+			<if test="query.modifiedTime != null and query.modifiedTime!=''">
+				 <![CDATA[ and  p.modified_time=str_to_date(#{query.modifiedTime}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+	<!-- 通用条件列-->
+	<sql id="base_condition">
+	 <where>
+		 <include refid="base_condition_filed" />
+	 </where>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.oidFuzzy!= null  and query.oidFuzzy!=''">
+				 and  p.oid like concat('%', #{query.oidFuzzy}, '%')
+			</if>
+			<if test="query.uidFuzzy!= null  and query.uidFuzzy!=''">
+				 and  p.uid like concat('%', #{query.uidFuzzy}, '%')
+			</if>
+			<if test="query.recvNameFuzzy!= null  and query.recvNameFuzzy!=''">
+				 and  p.recv_name like concat('%', #{query.recvNameFuzzy}, '%')
+			</if>
+			<if test="query.recvPhoneFuzzy!= null  and query.recvPhoneFuzzy!=''">
+				 and  p.recv_phone like concat('%', #{query.recvPhoneFuzzy}, '%')
+			</if>
+			<if test="query.recvProvinceFuzzy!= null  and query.recvProvinceFuzzy!=''">
+				 and  p.recv_province like concat('%', #{query.recvProvinceFuzzy}, '%')
+			</if>
+			<if test="query.recvCityFuzzy!= null  and query.recvCityFuzzy!=''">
+				 and  p.recv_city like concat('%', #{query.recvCityFuzzy}, '%')
+			</if>
+			<if test="query.recvAreaFuzzy!= null  and query.recvAreaFuzzy!=''">
+				 and  p.recv_area like concat('%', #{query.recvAreaFuzzy}, '%')
+			</if>
+			<if test="query.recvAddressFuzzy!= null  and query.recvAddressFuzzy!=''">
+				 and  p.recv_address like concat('%', #{query.recvAddressFuzzy}, '%')
+			</if>
+			<if test="query.orderTimeStart!= null and query.orderTimeStart!=''">
+				 <![CDATA[ and  p.order_time>=str_to_date(#{query.orderTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.orderTimeEnd!= null and query.orderTimeEnd!=''">
+				 <![CDATA[ and  p.order_time< date_sub(str_to_date(#{query.orderTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.payTimeStart!= null and query.payTimeStart!=''">
+				 <![CDATA[ and  p.pay_time>=str_to_date(#{query.payTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.payTimeEnd!= null and query.payTimeEnd!=''">
+				 <![CDATA[ and  p.pay_time< date_sub(str_to_date(#{query.payTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.createdUserFuzzy!= null  and query.createdUserFuzzy!=''">
+				 and  p.created_user like concat('%', #{query.createdUserFuzzy}, '%')
+			</if>
+			<if test="query.createdTimeStart!= null and query.createdTimeStart!=''">
+				 <![CDATA[ and  p.created_time>=str_to_date(#{query.createdTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createdTimeEnd!= null and query.createdTimeEnd!=''">
+				 <![CDATA[ and  p.created_time< date_sub(str_to_date(#{query.createdTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.modifiedUserFuzzy!= null  and query.modifiedUserFuzzy!=''">
+				 and  p.modified_user like concat('%', #{query.modifiedUserFuzzy}, '%')
+			</if>
+			<if test="query.modifiedTimeStart!= null and query.modifiedTimeStart!=''">
+				 <![CDATA[ and  p.modified_time>=str_to_date(#{query.modifiedTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.modifiedTimeEnd!= null and query.modifiedTimeEnd!=''">
+				 <![CDATA[ and  p.modified_time< date_sub(str_to_date(#{query.modifiedTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM product_order p <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM product_order p <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.ybc.entity.po.ProductOrder">
+		 INSERT INTO product_order
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.oid != null">
+				 oid,
+			</if>
+			<if test="bean.uid != null">
+				 uid,
+			</if>
+			<if test="bean.recvName != null">
+				 recv_name,
+			</if>
+			<if test="bean.recvPhone != null">
+				 recv_phone,
+			</if>
+			<if test="bean.recvProvince != null">
+				 recv_province,
+			</if>
+			<if test="bean.recvCity != null">
+				 recv_city,
+			</if>
+			<if test="bean.recvArea != null">
+				 recv_area,
+			</if>
+			<if test="bean.recvAddress != null">
+				 recv_address,
+			</if>
+			<if test="bean.totalPrice != null">
+				 total_price,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.orderTime != null">
+				 order_time,
+			</if>
+			<if test="bean.payTime != null">
+				 pay_time,
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user,
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time,
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user,
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.oid!=null">
+				 #{bean.oid},
+			</if>
+			<if test="bean.uid!=null">
+				 #{bean.uid},
+			</if>
+			<if test="bean.recvName!=null">
+				 #{bean.recvName},
+			</if>
+			<if test="bean.recvPhone!=null">
+				 #{bean.recvPhone},
+			</if>
+			<if test="bean.recvProvince!=null">
+				 #{bean.recvProvince},
+			</if>
+			<if test="bean.recvCity!=null">
+				 #{bean.recvCity},
+			</if>
+			<if test="bean.recvArea!=null">
+				 #{bean.recvArea},
+			</if>
+			<if test="bean.recvAddress!=null">
+				 #{bean.recvAddress},
+			</if>
+			<if test="bean.totalPrice!=null">
+				 #{bean.totalPrice},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.orderTime!=null">
+				 #{bean.orderTime},
+			</if>
+			<if test="bean.payTime!=null">
+				 #{bean.payTime},
+			</if>
+			<if test="bean.createdUser!=null">
+				 #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime!=null">
+				 #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 #{bean.modifiedTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 根据Oid修改-->
+	<update id="updateByOid" parameterType="com.ybc.entity.po.ProductOrder">
+		 UPDATE product_order
+ 		 <set> 
+			<if test="bean.uid != null">
+				 uid = #{bean.uid},
+			</if>
+			<if test="bean.recvName != null">
+				 recv_name = #{bean.recvName},
+			</if>
+			<if test="bean.recvPhone != null">
+				 recv_phone = #{bean.recvPhone},
+			</if>
+			<if test="bean.recvProvince != null">
+				 recv_province = #{bean.recvProvince},
+			</if>
+			<if test="bean.recvCity != null">
+				 recv_city = #{bean.recvCity},
+			</if>
+			<if test="bean.recvArea != null">
+				 recv_area = #{bean.recvArea},
+			</if>
+			<if test="bean.recvAddress != null">
+				 recv_address = #{bean.recvAddress},
+			</if>
+			<if test="bean.totalPrice != null">
+				 total_price = #{bean.totalPrice},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.orderTime != null">
+				 order_time = #{bean.orderTime},
+			</if>
+			<if test="bean.payTime != null">
+				 pay_time = #{bean.payTime},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser!=null">
+				modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime!=null">
+				modified_time = #{bean.modifiedTime},
+			</if>
+			 <if test="bean.num!=null">
+				 num=#{bean.num},
+			 </if>
+ 		 </set>
+ 		 where oid=#{oid}
+	</update>
+
+	<!-- 根据Oid删除-->
+	<delete id="deleteByOid">
+		delete from product_order where oid=#{oid}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByOid" resultMap="base_result_map" >
+		select * from product_order  where oid=#{oid}
+	</select>
+
+<!--新增订单-->
+	<insert id="addOrder" parameterType="com.ybc.entity.po.ProductOrder">
+		insert into product_order(
+		    oid,
+		    uid,
+		    recv_name,
+		    recv_phone,
+		    recv_province,
+		    recv_city,
+		    recv_area,
+		    recv_address,
+		    total_price,
+		    status,
+		    order_time,
+		    pay_time,
+		    created_user,
+		    created_time,
+		    modified_user,
+		    modified_time,
+		  	num
+		) values(
+		    #{productOrder.oid},
+			#{productOrder.uid},
+			#{productOrder.recvName},
+			#{productOrder.recvPhone},
+			#{productOrder.recvProvince},
+			#{productOrder.recvCity},
+			#{productOrder.recvArea},
+			#{productOrder.recvAddress},
+			#{productOrder.totalPrice},
+			#{productOrder.status},
+			#{productOrder.orderTime},
+			#{productOrder.payTime},
+			#{productOrder.createdUser},
+			#{productOrder.createdTime},
+			#{productOrder.modifiedUser},
+			#{productOrder.modifiedTime},
+			#{productOrder.num}
+		)
+	</insert>
+
+	<select id="selectByUid" resultType="com.ybc.entity.po.ProductOrder">
+		select * from product_order where uid=#{uid}
+	</select>
+	<select id="selectByOidToSaveRedis" resultType="com.ybc.entity.dto.OrderDto">
+		select * from product_order where oid=#{oid}
+	</select>
+
+</mapper>

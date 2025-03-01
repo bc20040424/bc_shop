@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ybc.mappers.UserInfoMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.ybc.entity.po.UserInfo">
+		<!--用户id-->
+		<result column="id" property="id"  />
+		<!--用户名-->
+		<result column="username" property="username"  />
+		<!--密码-->
+		<result column="password" property="password"  />
+		<!--盐值-->
+		<result column="salt" property="salt"  />
+		<!--电话号码-->
+		<result column="phone" property="phone"  />
+		<!--电子邮箱-->
+		<result column="email" property="email"  />
+		<!--性别:0-女，1-男-->
+		<result column="gender" property="gender"  />
+		<!--头像-->
+		<result column="avatar" property="avatar"  />
+		<!--是否删除：0-未删除，1-已删除-->
+		<result column="is_delete" property="isDelete"  />
+		<!--日志-创建人-->
+		<result column="created_user" property="createdUser"  />
+		<!--日志-创建时间-->
+		<result column="created_time" property="createdTime"  />
+		<!--日志-最后修改执行人-->
+		<result column="modified_user" property="modifiedUser"  />
+		<!--日志-最后修改时间-->
+		<result column="modified_time" property="modifiedTime"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 u.id,u.username,u.password,u.salt,u.phone,
+		 u.email,u.gender,u.avatar,u.is_delete,u.created_user,
+		 u.created_time,u.modified_user,u.modified_time
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.id != null and query.id!=''">
+				 and  u.id = #{query.id}
+			</if>
+			<if test="query.username != null and query.username!=''">
+				 and  u.username = #{query.username}
+			</if>
+			<if test="query.password != null and query.password!=''">
+				 and  u.password = #{query.password}
+			</if>
+			<if test="query.salt != null and query.salt!=''">
+				 and  u.salt = #{query.salt}
+			</if>
+			<if test="query.phone != null and query.phone!=''">
+				 and  u.phone = #{query.phone}
+			</if>
+			<if test="query.email != null and query.email!=''">
+				 and  u.email = #{query.email}
+			</if>
+			<if test="query.gender != null">
+				 and  u.gender = #{query.gender}
+			</if>
+			<if test="query.avatar != null and query.avatar!=''">
+				 and  u.avatar = #{query.avatar}
+			</if>
+			<if test="query.isDelete != null">
+				 and  u.is_delete = #{query.isDelete}
+			</if>
+			<if test="query.createdUser != null and query.createdUser!=''">
+				 and  u.created_user = #{query.createdUser}
+			</if>
+			<if test="query.createdTime != null and query.createdTime!=''">
+				 <![CDATA[ and  u.created_time=str_to_date(#{query.createdTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.modifiedUser != null and query.modifiedUser!=''">
+				 and  u.modified_user = #{query.modifiedUser}
+			</if>
+			<if test="query.modifiedTime != null and query.modifiedTime!=''">
+				 <![CDATA[ and  u.modified_time=str_to_date(#{query.modifiedTime}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+	<!-- 通用条件列-->
+	<sql id="base_condition">
+	 <where>
+		 <include refid="base_condition_filed" />
+	 </where>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.idFuzzy!= null  and query.idFuzzy!=''">
+				 and  u.id like concat('%', #{query.idFuzzy}, '%')
+			</if>
+			<if test="query.usernameFuzzy!= null  and query.usernameFuzzy!=''">
+				 and  u.username like concat('%', #{query.usernameFuzzy}, '%')
+			</if>
+			<if test="query.passwordFuzzy!= null  and query.passwordFuzzy!=''">
+				 and  u.password like concat('%', #{query.passwordFuzzy}, '%')
+			</if>
+			<if test="query.saltFuzzy!= null  and query.saltFuzzy!=''">
+				 and  u.salt like concat('%', #{query.saltFuzzy}, '%')
+			</if>
+			<if test="query.phoneFuzzy!= null  and query.phoneFuzzy!=''">
+				 and  u.phone like concat('%', #{query.phoneFuzzy}, '%')
+			</if>
+			<if test="query.emailFuzzy!= null  and query.emailFuzzy!=''">
+				 and  u.email like concat('%', #{query.emailFuzzy}, '%')
+			</if>
+			<if test="query.avatarFuzzy!= null  and query.avatarFuzzy!=''">
+				 and  u.avatar like concat('%', #{query.avatarFuzzy}, '%')
+			</if>
+			<if test="query.createdUserFuzzy!= null  and query.createdUserFuzzy!=''">
+				 and  u.created_user like concat('%', #{query.createdUserFuzzy}, '%')
+			</if>
+			<if test="query.createdTimeStart!= null and query.createdTimeStart!=''">
+				 <![CDATA[ and  u.created_time>=str_to_date(#{query.createdTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createdTimeEnd!= null and query.createdTimeEnd!=''">
+				 <![CDATA[ and  u.created_time< date_sub(str_to_date(#{query.createdTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.modifiedUserFuzzy!= null  and query.modifiedUserFuzzy!=''">
+				 and  u.modified_user like concat('%', #{query.modifiedUserFuzzy}, '%')
+			</if>
+			<if test="query.modifiedTimeStart!= null and query.modifiedTimeStart!=''">
+				 <![CDATA[ and  u.modified_time>=str_to_date(#{query.modifiedTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.modifiedTimeEnd!= null and query.modifiedTimeEnd!=''">
+				 <![CDATA[ and  u.modified_time< date_sub(str_to_date(#{query.modifiedTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM user_info u <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM user_info u <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.ybc.entity.po.UserInfo">
+		 INSERT INTO user_info
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.id != null">
+				 id,
+			</if>
+			<if test="bean.username != null">
+				 username,
+			</if>
+			<if test="bean.password != null">
+				 password,
+			</if>
+			<if test="bean.salt != null">
+				 salt,
+			</if>
+			<if test="bean.phone != null">
+				 phone,
+			</if>
+			<if test="bean.email != null">
+				 email,
+			</if>
+			<if test="bean.gender != null">
+				 gender,
+			</if>
+			<if test="bean.avatar != null">
+				 avatar,
+			</if>
+			<if test="bean.isDelete != null">
+				 is_delete,
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user,
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time,
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user,
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.id!=null">
+				 #{bean.id},
+			</if>
+			<if test="bean.username!=null">
+				 #{bean.username},
+			</if>
+			<if test="bean.password!=null">
+				 #{bean.password},
+			</if>
+			<if test="bean.salt!=null">
+				 #{bean.salt},
+			</if>
+			<if test="bean.phone!=null">
+				 #{bean.phone},
+			</if>
+			<if test="bean.email!=null">
+				 #{bean.email},
+			</if>
+			<if test="bean.gender!=null">
+				 #{bean.gender},
+			</if>
+			<if test="bean.avatar!=null">
+				 #{bean.avatar},
+			</if>
+			<if test="bean.isDelete!=null">
+				 #{bean.isDelete},
+			</if>
+			<if test="bean.createdUser!=null">
+				 #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime!=null">
+				 #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 #{bean.modifiedTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.ybc.entity.po.UserInfo">
+		 INSERT INTO user_info
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.id != null">
+				 id,
+			</if>
+			<if test="bean.username != null">
+				 username,
+			</if>
+			<if test="bean.password != null">
+				 password,
+			</if>
+			<if test="bean.salt != null">
+				 salt,
+			</if>
+			<if test="bean.phone != null">
+				 phone,
+			</if>
+			<if test="bean.email != null">
+				 email,
+			</if>
+			<if test="bean.gender != null">
+				 gender,
+			</if>
+			<if test="bean.avatar != null">
+				 avatar,
+			</if>
+			<if test="bean.isDelete != null">
+				 is_delete,
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user,
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time,
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user,
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.id!=null">
+				 #{bean.id},
+			</if>
+			<if test="bean.username!=null">
+				 #{bean.username},
+			</if>
+			<if test="bean.password!=null">
+				 #{bean.password},
+			</if>
+			<if test="bean.salt!=null">
+				 #{bean.salt},
+			</if>
+			<if test="bean.phone!=null">
+				 #{bean.phone},
+			</if>
+			<if test="bean.email!=null">
+				 #{bean.email},
+			</if>
+			<if test="bean.gender!=null">
+				 #{bean.gender},
+			</if>
+			<if test="bean.avatar!=null">
+				 #{bean.avatar},
+			</if>
+			<if test="bean.isDelete!=null">
+				 #{bean.isDelete},
+			</if>
+			<if test="bean.createdUser!=null">
+				 #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime!=null">
+				 #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 #{bean.modifiedTime},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.id!=null">
+				 id = VALUES(id),
+			</if>
+			<if test="bean.username!=null">
+				 username = VALUES(username),
+			</if>
+			<if test="bean.password!=null">
+				 password = VALUES(password),
+			</if>
+			<if test="bean.salt!=null">
+				 salt = VALUES(salt),
+			</if>
+			<if test="bean.phone!=null">
+				 phone = VALUES(phone),
+			</if>
+			<if test="bean.email!=null">
+				 email = VALUES(email),
+			</if>
+			<if test="bean.gender!=null">
+				 gender = VALUES(gender),
+			</if>
+			<if test="bean.avatar!=null">
+				 avatar = VALUES(avatar),
+			</if>
+			<if test="bean.isDelete!=null">
+				 is_delete = VALUES(is_delete),
+			</if>
+			<if test="bean.createdUser!=null">
+				 created_user = VALUES(created_user),
+			</if>
+			<if test="bean.createdTime!=null">
+				 created_time = VALUES(created_time),
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 modified_user = VALUES(modified_user),
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 modified_time = VALUES(modified_time),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.ybc.entity.po.UserInfo">
+		 INSERT INTO user_info(
+			 id,
+			 username,
+			 password,
+			 salt,
+			 phone,
+			 email,
+			 gender,
+			 avatar,
+			 is_delete,
+			 created_user,
+			 created_time,
+			 modified_user,
+			 modified_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.id},
+				 #{item.username},
+				 #{item.password},
+				 #{item.salt},
+				 #{item.phone},
+				 #{item.email},
+				 #{item.gender},
+				 #{item.avatar},
+				 #{item.isDelete},
+				 #{item.createdUser},
+				 #{item.createdTime},
+				 #{item.modifiedUser},
+				 #{item.modifiedTime}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.ybc.entity.po.UserInfo">
+		 INSERT INTO user_info(
+			 id,
+			 username,
+			 password,
+			 salt,
+			 phone,
+			 email,
+			 gender,
+			 avatar,
+			 is_delete,
+			 created_user,
+			 created_time,
+			 modified_user,
+			 modified_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.id},
+				 #{item.username},
+				 #{item.password},
+				 #{item.salt},
+				 #{item.phone},
+				 #{item.email},
+				 #{item.gender},
+				 #{item.avatar},
+				 #{item.isDelete},
+				 #{item.createdUser},
+				 #{item.createdTime},
+				 #{item.modifiedUser},
+				 #{item.modifiedTime}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			id = VALUES(id),
+			username = VALUES(username),
+			password = VALUES(password),
+			salt = VALUES(salt),
+			phone = VALUES(phone),
+			email = VALUES(email),
+			gender = VALUES(gender),
+			avatar = VALUES(avatar),
+			is_delete = VALUES(is_delete),
+			created_user = VALUES(created_user),
+			created_time = VALUES(created_time),
+			modified_user = VALUES(modified_user),
+			modified_time = VALUES(modified_time)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.ybc.entity.query.UserInfoQuery">
+		 UPDATE user_info u
+ 		 <set> 
+			<if test="bean.id != null">
+				 id = #{bean.id},
+			</if>
+			<if test="bean.username != null">
+				 username = #{bean.username},
+			</if>
+			<if test="bean.password != null">
+				 password = #{bean.password},
+			</if>
+			<if test="bean.salt != null">
+				 salt = #{bean.salt},
+			</if>
+			<if test="bean.phone != null">
+				 phone = #{bean.phone},
+			</if>
+			<if test="bean.email != null">
+				 email = #{bean.email},
+			</if>
+			<if test="bean.gender != null">
+				 gender = #{bean.gender},
+			</if>
+			<if test="bean.avatar != null">
+				 avatar = #{bean.avatar},
+			</if>
+			<if test="bean.isDelete != null">
+				 is_delete = #{bean.isDelete},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete u from user_info u
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据Id修改-->
+	<update id="updateById" parameterType="com.ybc.entity.po.UserInfo">
+		 UPDATE user_info
+ 		 <set> 
+			<if test="bean.username != null">
+				 username = #{bean.username},
+			</if>
+			<if test="bean.password != null">
+				 password = #{bean.password},
+			</if>
+			<if test="bean.salt != null">
+				 salt = #{bean.salt},
+			</if>
+			<if test="bean.phone != null">
+				 phone = #{bean.phone},
+			</if>
+			<if test="bean.email != null">
+				 email = #{bean.email},
+			</if>
+			<if test="bean.gender != null">
+				 gender = #{bean.gender},
+			</if>
+			<if test="bean.avatar != null">
+				 avatar = #{bean.avatar},
+			</if>
+			<if test="bean.isDelete != null">
+				 is_delete = #{bean.isDelete},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 where id=#{id}
+	</update>
+
+	<!-- 根据Id删除-->
+	<delete id="deleteById">
+		delete from user_info where id=#{id}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectById" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from user_info u where id=#{id}
+	</select>
+
+	<!-- 根据Username修改-->
+	<update id="updateByUsername" parameterType="com.ybc.entity.po.UserInfo">
+		 UPDATE user_info
+ 		 <set> 
+			<if test="bean.id != null">
+				 id = #{bean.id},
+			</if>
+			<if test="bean.password != null">
+				 password = #{bean.password},
+			</if>
+			<if test="bean.salt != null">
+				 salt = #{bean.salt},
+			</if>
+			<if test="bean.phone != null">
+				 phone = #{bean.phone},
+			</if>
+			<if test="bean.email != null">
+				 email = #{bean.email},
+			</if>
+			<if test="bean.gender != null">
+				 gender = #{bean.gender},
+			</if>
+			<if test="bean.avatar != null">
+				 avatar = #{bean.avatar},
+			</if>
+			<if test="bean.isDelete != null">
+				 is_delete = #{bean.isDelete},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 where username=#{username}
+	</update>
+
+	<!-- 根据Username删除-->
+	<delete id="deleteByUsername">
+		delete from user_info where username=#{username}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByUsername" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from user_info u where username=#{username}
+	</select>
+
+<!--	根据email查询-->
+	<select id="selectByEmail" resultMap="base_result_map">
+		select<include refid="base_column_list" /> from user_info u where email=#{email}
+	</select>
+
+	<update id="updateAvatarByUserId">
+		update user_info set avatar=#{avatar},modified_time=#{modTime} where id=#{userId}
+	</update>
+
+</mapper>

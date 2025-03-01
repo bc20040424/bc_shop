@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ybc.mappers.ProductCartMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.ybc.entity.po.ProductCart">
+		<!--购物车数据id-->
+		<result column="cid" property="cid"  />
+		<!--用户id-->
+		<result column="uid" property="uid"  />
+		<!--商品id-->
+		<result column="pid" property="pid"  />
+		<!--加入时商品单价-->
+		<result column="price" property="price"  />
+		<!--商品数量-->
+		<result column="num" property="num"  />
+		<!--创建人-->
+		<result column="created_user" property="createdUser"  />
+		<!--创建时间-->
+		<result column="created_time" property="createdTime"  />
+		<!--修改人-->
+		<result column="modified_user" property="modifiedUser"  />
+		<!--修改时间-->
+		<result column="modified_time" property="modifiedTime"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 p.cid,p.uid,p.pid,p.price,p.num,
+		 p.created_user,p.created_time,p.modified_user,p.modified_time
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.cid != null and query.cid!=''">
+				 and  p.cid = #{query.cid}
+			</if>
+			<if test="query.uid != null and query.uid!=''">
+				 and  p.uid = #{query.uid}
+			</if>
+			<if test="query.pid != null and query.pid!=''">
+				 and  p.pid = #{query.pid}
+			</if>
+			<if test="query.price != null">
+				 and  p.price = #{query.price}
+			</if>
+			<if test="query.num != null">
+				 and  p.num = #{query.num}
+			</if>
+			<if test="query.createdUser != null and query.createdUser!=''">
+				 and  p.created_user = #{query.createdUser}
+			</if>
+			<if test="query.createdTime != null and query.createdTime!=''">
+				 <![CDATA[ and  p.created_time=str_to_date(#{query.createdTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.modifiedUser != null and query.modifiedUser!=''">
+				 and  p.modified_user = #{query.modifiedUser}
+			</if>
+			<if test="query.modifiedTime != null and query.modifiedTime!=''">
+				 <![CDATA[ and  p.modified_time=str_to_date(#{query.modifiedTime}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+	<!-- 通用条件列-->
+	<sql id="base_condition">
+	 <where>
+		 <include refid="base_condition_filed" />
+	 </where>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.cidFuzzy!= null  and query.cidFuzzy!=''">
+				 and  p.cid like concat('%', #{query.cidFuzzy}, '%')
+			</if>
+			<if test="query.uidFuzzy!= null  and query.uidFuzzy!=''">
+				 and  p.uid like concat('%', #{query.uidFuzzy}, '%')
+			</if>
+			<if test="query.pidFuzzy!= null  and query.pidFuzzy!=''">
+				 and  p.pid like concat('%', #{query.pidFuzzy}, '%')
+			</if>
+			<if test="query.createdUserFuzzy!= null  and query.createdUserFuzzy!=''">
+				 and  p.created_user like concat('%', #{query.createdUserFuzzy}, '%')
+			</if>
+			<if test="query.createdTimeStart!= null and query.createdTimeStart!=''">
+				 <![CDATA[ and  p.created_time>=str_to_date(#{query.createdTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createdTimeEnd!= null and query.createdTimeEnd!=''">
+				 <![CDATA[ and  p.created_time< date_sub(str_to_date(#{query.createdTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.modifiedUserFuzzy!= null  and query.modifiedUserFuzzy!=''">
+				 and  p.modified_user like concat('%', #{query.modifiedUserFuzzy}, '%')
+			</if>
+			<if test="query.modifiedTimeStart!= null and query.modifiedTimeStart!=''">
+				 <![CDATA[ and  p.modified_time>=str_to_date(#{query.modifiedTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.modifiedTimeEnd!= null and query.modifiedTimeEnd!=''">
+				 <![CDATA[ and  p.modified_time< date_sub(str_to_date(#{query.modifiedTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM product_cart p <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM product_cart p <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.ybc.entity.po.ProductCart">
+		 INSERT INTO product_cart
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.cid != null">
+				 cid,
+			</if>
+			<if test="bean.uid != null">
+				 uid,
+			</if>
+			<if test="bean.pid != null">
+				 pid,
+			</if>
+			<if test="bean.price != null">
+				 price,
+			</if>
+			<if test="bean.num != null">
+				 num,
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user,
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time,
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user,
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.cid!=null">
+				 #{bean.cid},
+			</if>
+			<if test="bean.uid!=null">
+				 #{bean.uid},
+			</if>
+			<if test="bean.pid!=null">
+				 #{bean.pid},
+			</if>
+			<if test="bean.price!=null">
+				 #{bean.price},
+			</if>
+			<if test="bean.num!=null">
+				 #{bean.num},
+			</if>
+			<if test="bean.createdUser!=null">
+				 #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime!=null">
+				 #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 #{bean.modifiedTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.ybc.entity.po.ProductCart">
+		 INSERT INTO product_cart
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.cid != null">
+				 cid,
+			</if>
+			<if test="bean.uid != null">
+				 uid,
+			</if>
+			<if test="bean.pid != null">
+				 pid,
+			</if>
+			<if test="bean.price != null">
+				 price,
+			</if>
+			<if test="bean.num != null">
+				 num,
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user,
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time,
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user,
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.cid!=null">
+				 #{bean.cid},
+			</if>
+			<if test="bean.uid!=null">
+				 #{bean.uid},
+			</if>
+			<if test="bean.pid!=null">
+				 #{bean.pid},
+			</if>
+			<if test="bean.price!=null">
+				 #{bean.price},
+			</if>
+			<if test="bean.num!=null">
+				 #{bean.num},
+			</if>
+			<if test="bean.createdUser!=null">
+				 #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime!=null">
+				 #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 #{bean.modifiedTime},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.cid!=null">
+				 cid = VALUES(cid),
+			</if>
+			<if test="bean.uid!=null">
+				 uid = VALUES(uid),
+			</if>
+			<if test="bean.pid!=null">
+				 pid = VALUES(pid),
+			</if>
+			<if test="bean.price!=null">
+				 price = VALUES(price),
+			</if>
+			<if test="bean.num!=null">
+				 num = VALUES(num),
+			</if>
+			<if test="bean.createdUser!=null">
+				 created_user = VALUES(created_user),
+			</if>
+			<if test="bean.createdTime!=null">
+				 created_time = VALUES(created_time),
+			</if>
+			<if test="bean.modifiedUser!=null">
+				 modified_user = VALUES(modified_user),
+			</if>
+			<if test="bean.modifiedTime!=null">
+				 modified_time = VALUES(modified_time),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.ybc.entity.po.ProductCart">
+		 INSERT INTO product_cart(
+			 cid,
+			 uid,
+			 pid,
+			 price,
+			 num,
+			 created_user,
+			 created_time,
+			 modified_user,
+			 modified_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.cid},
+				 #{item.uid},
+				 #{item.pid},
+				 #{item.price},
+				 #{item.num},
+				 #{item.createdUser},
+				 #{item.createdTime},
+				 #{item.modifiedUser},
+				 #{item.modifiedTime}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.ybc.entity.po.ProductCart">
+		 INSERT INTO product_cart(
+			 cid,
+			 uid,
+			 pid,
+			 price,
+			 num,
+			 created_user,
+			 created_time,
+			 modified_user,
+			 modified_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.cid},
+				 #{item.uid},
+				 #{item.pid},
+				 #{item.price},
+				 #{item.num},
+				 #{item.createdUser},
+				 #{item.createdTime},
+				 #{item.modifiedUser},
+				 #{item.modifiedTime}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			cid = VALUES(cid),
+			uid = VALUES(uid),
+			pid = VALUES(pid),
+			price = VALUES(price),
+			num = VALUES(num),
+			created_user = VALUES(created_user),
+			created_time = VALUES(created_time),
+			modified_user = VALUES(modified_user),
+			modified_time = VALUES(modified_time)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.ybc.entity.query.ProductCartQuery">
+		 UPDATE product_cart p
+ 		 <set> 
+			<if test="bean.cid != null">
+				 cid = #{bean.cid},
+			</if>
+			<if test="bean.uid != null">
+				 uid = #{bean.uid},
+			</if>
+			<if test="bean.pid != null">
+				 pid = #{bean.pid},
+			</if>
+			<if test="bean.price != null">
+				 price = #{bean.price},
+			</if>
+			<if test="bean.num != null">
+				 num = #{bean.num},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete p from product_cart p
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据Cid修改-->
+	<update id="updateByCid" parameterType="com.ybc.entity.po.ProductCart">
+		 UPDATE product_cart
+ 		 <set> 
+			<if test="bean.uid != null">
+				 uid = #{bean.uid},
+			</if>
+			<if test="bean.pid != null">
+				 pid = #{bean.pid},
+			</if>
+			<if test="bean.price != null">
+				 price = #{bean.price},
+			</if>
+			<if test="bean.num != null">
+				 num = #{bean.num},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 where cid=#{cid}
+	</update>
+
+	<!-- 根据Cid删除-->
+	<delete id="deleteByCid">
+		delete from product_cart where cid=#{cid}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByCid" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from product_cart p where cid=#{cid}
+	</select>
+
+	<!-- 根据Uid修改-->
+	<update id="updateByUid" parameterType="com.ybc.entity.po.ProductCart">
+		 UPDATE product_cart
+ 		 <set> 
+			<if test="bean.cid != null">
+				 cid = #{bean.cid},
+			</if>
+			<if test="bean.pid != null">
+				 pid = #{bean.pid},
+			</if>
+			<if test="bean.price != null">
+				 price = #{bean.price},
+			</if>
+			<if test="bean.num != null">
+				 num = #{bean.num},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 where uid=#{uid}
+	</update>
+
+	<!-- 根据Uid删除-->
+	<delete id="deleteByUid">
+		delete from product_cart where uid=#{uid}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByUid" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from product_cart p where uid=#{uid}
+	</select>
+
+	<!-- 根据Pid修改-->
+	<update id="updateByPid" parameterType="com.ybc.entity.po.ProductCart">
+		 UPDATE product_cart
+ 		 <set> 
+			<if test="bean.cid != null">
+				 cid = #{bean.cid},
+			</if>
+			<if test="bean.uid != null">
+				 uid = #{bean.uid},
+			</if>
+			<if test="bean.price != null">
+				 price = #{bean.price},
+			</if>
+			<if test="bean.num != null">
+				 num = #{bean.num},
+			</if>
+			<if test="bean.createdUser != null">
+				 created_user = #{bean.createdUser},
+			</if>
+			<if test="bean.createdTime != null">
+				 created_time = #{bean.createdTime},
+			</if>
+			<if test="bean.modifiedUser != null">
+				 modified_user = #{bean.modifiedUser},
+			</if>
+			<if test="bean.modifiedTime != null">
+				 modified_time = #{bean.modifiedTime},
+			</if>
+ 		 </set>
+ 		 where pid=#{pid}
+	</update>
+
+	<!-- 根据Pid删除-->
+	<delete id="deleteByPid">
+		delete from product_cart where pid=#{pid}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByPid" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from product_cart p where pid=#{pid}
+	</select>
+
+	<!--	根据pid和uid查询购物车信息-->
+	<select id="selectByPidAndUid" resultType="com.ybc.entity.po.ProductCart">
+		select cid from product_cart where uid=#{uid} AND pid=#{pid}
+	</select>
+
+	<!--	根据cid修改数量-->
+	<update id="updateNumByCid" parameterType="com.ybc.entity.po.ProductCart">
+		update product_cart
+		<set>
+			<if test="createdTime!=null">
+				created_time=#{createdTime}
+			</if>
+			<if test="num!=null">
+				num=#{num}
+			</if>
+			<if test="createdUser!=null">
+				created_user=#{createdUser}
+			</if>
+		</set>
+		where cid=#{cid}
+	</update>
+
+<!--向购物车中插入数据-->
+	<insert id="insertByBean" parameterType="com.ybc.entity.po.ProductCart">
+		insert into product_cart(
+		                         cid,
+		                         uid,
+		                         pid,
+		                         price,
+		                         num,
+		                         created_user,
+		                         created_time,
+		                         modified_user,
+		                         modified_time
+
+		)values (#{bean.cid},
+                 #{bean.uid},
+                 #{bean.pid},
+                 #{bean.price},
+                 #{bean.num},
+                 #{bean.createdUser},
+                 #{bean.createdTime},
+                 #{bean.modifiedUser},
+                 #{bean.modifiedTime}
+						)
+	</insert>
+
+<!--清空购物车-->
+	<delete id="deleteProductToShopCar">
+		delete from product_cart where cid=#{cid}
+	</delete>
+
+	<delete id="deleteAll">
+		delete from product_cart
+	</delete>
+
+<!--根据用户名查询购物车信息-->
+	<select id="selectShopCarByUser" resultType="com.ybc.entity.po.ProductCart">
+		select * from product_cart where created_user=#{userName}
+	</select>
+</mapper>
